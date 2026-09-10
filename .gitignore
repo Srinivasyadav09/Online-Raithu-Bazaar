@@ -1,0 +1,15 @@
+backend/venv/
+frontend/node_modules/
+
+backend/.env
+frontend/.env
+
+*.zip/
+__pycache__/
+*.pyc
+
+frontend/dist/
+frontend/build/
+
+backend/uploads/*
+!backend/uploads/.gitkeep

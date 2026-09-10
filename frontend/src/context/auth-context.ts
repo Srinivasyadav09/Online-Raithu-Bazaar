@@ -1,0 +1,11 @@
+import { createContext } from "react";
+import type { User } from "../types/auth";
+
+export interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  loginUser: (user: User, token: string) => void;
+  logout: () => void;
+}
+
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
