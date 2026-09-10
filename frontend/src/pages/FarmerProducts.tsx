@@ -85,4 +85,40 @@ export default function FarmerProducts() {
   </main>;
 }
 
-function Field({ label, value, onChange, input, type = "text", required = false }: { label: string; value: string; onChange: (v: string) => void; input: string; type?: string; required?: boolean }) { return <div><label className="mb-2 block text-sm font-medium text-gray-700">{label}</label><input type={type} value={value} onChange={(e) => onChange(e.target.value)} className={input} required={required} /></div>; }
+function Field({
+  label,
+  value,
+  onChange,
+  input,
+  type = "text",
+  step,
+  min,
+  required = false,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  input: string;
+  type?: string;
+  step?: string;
+  min?: string;
+  required?: boolean;
+}) {
+  return (
+    <div>
+      <label className="mb-2 block text-sm font-medium text-gray-700">
+        {label}
+      </label>
+
+      <input
+        type={type}
+        step={step}
+        min={min}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={input}
+        required={required}
+      />
+    </div>
+  );
+}
