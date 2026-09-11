@@ -3,6 +3,7 @@
 Revision ID: 8f4a1c2d9b7e
 Revises: 32dca88ecba9
 """
+
 from alembic import op
 import sqlalchemy as sa
 
@@ -10,6 +11,7 @@ revision = "8f4a1c2d9b7e"
 down_revision = "32dca88ecba9"
 branch_labels = None
 depends_on = None
+
 
 def upgrade():
     verification_status_enum = sa.Enum(
@@ -19,7 +21,10 @@ def upgrade():
         name="farmerverificationstatus",
     )
 
-    verification_status_enum.create(op.get_bind(), checkfirst=True)
+    verification_status_enum.create(
+        op.get_bind(),
+        checkfirst=True,
+    )
 
     op.add_column(
         "farmers",
@@ -35,8 +40,9 @@ def upgrade():
         UPDATE farmers
         SET verification_status =
             CASE
-                WHEN organic_certified = true THEN 'COMPLETED'
-                ELSE 'PROFILE_SUBMITTED'
+                WHEN organic_certified = true
+                    THEN 'COMPLETED'::farmerverificationstatus
+                ELSE 'PROFILE_SUBMITTED'::farmerverificationstatus
             END
         """
     )
@@ -49,11 +55,17 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_column("farmers", "verification_status")
+    op.drop_column(
+        "farmers",
+        "verification_status",
+    )
 
     sa.Enum(
         "PROFILE_SUBMITTED",
         "VERIFYING",
         "COMPLETED",
         name="farmerverificationstatus",
-    ).drop(op.get_bind(), checkfirst=True)
+    ).drop(
+        op.get_bind(),
+        checkfirst=True,
+    )
