@@ -12,10 +12,48 @@ branch_labels = None
 depends_on = None
 
 def upgrade():
-    op.add_column("farmers", sa.Column("verification_status", sa.Enum("PROFILE_SUBMITTED", "VERIFYING", "COMPLETED", name="farmerverificationstatus"), nullable=True))
-    op.execute("UPDATE farmers SET verification_status = CASE WHEN organic_certified = true THEN 'COMPLETED' ELSE 'PROFILE_SUBMITTED' END")
-    op.alter_column("farmers", "verification_status", nullable=False)
+    verification_status_enum = sa.Enum(
+        "PROFILE_SUBMITTED",
+        "VERIFYING",
+        "COMPLETED",
+        name="farmerverificationstatus",
+    )
+
+    verification_status_enum.create(op.get_bind(), checkfirst=True)
+
+    op.add_column(
+        "farmers",
+        sa.Column(
+            "verification_status",
+            verification_status_enum,
+            nullable=True,
+        ),
+    )
+
+    op.execute(
+        """
+        UPDATE farmers
+        SET verification_status =
+            CASE
+                WHEN organic_certified = true THEN 'COMPLETED'
+                ELSE 'PROFILE_SUBMITTED'
+            END
+        """
+    )
+
+    op.alter_column(
+        "farmers",
+        "verification_status",
+        nullable=False,
+    )
+
 
 def downgrade():
     op.drop_column("farmers", "verification_status")
-    op.execute("DROP TYPE IF EXISTS farmerverificationstatus")
+
+    sa.Enum(
+        "PROFILE_SUBMITTED",
+        "VERIFYING",
+        "COMPLETED",
+        name="farmerverificationstatus",
+    ).drop(op.get_bind(), checkfirst=True)
